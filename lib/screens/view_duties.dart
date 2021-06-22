@@ -12,7 +12,7 @@ class ViewDutiesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Duty> myDuties = MyDuty.dutyItems;
+    List<Duty> myDuties = MyDuty().items;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -20,7 +20,10 @@ class ViewDutiesPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(EditDutyPage.routeName);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditDutyPage()),
+          );
         },
         child: Icon(Icons.add),
       ),

@@ -8,6 +8,7 @@ class Duty with ChangeNotifier {
   TimeOfDay dutyEndTime = TimeOfDay(hour: 23, minute: 59);
   bool onDuty;
   bool isLeave;
+  String? id;
 
   Duty({
     required this.dutyName,
@@ -17,6 +18,7 @@ class Duty with ChangeNotifier {
     this.isLeave = false,
     TimeOfDay? dutyStartTime,
     TimeOfDay? dutyEndTime,
+    this.id,
   })  : dutyAbbreviation = dutyAbbreviation.isEmpty
             ? '${dutyName.toUpperCase()[0]}' + '${dutyName.toUpperCase()[1]}'
             : dutyAbbreviation,
