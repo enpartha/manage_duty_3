@@ -20,7 +20,10 @@ class Duty with ChangeNotifier {
     TimeOfDay? dutyEndTime,
     this.id,
   })  : dutyAbbreviation = dutyAbbreviation.isEmpty
-            ? '${dutyName.toUpperCase()[0]}' + '${dutyName.toUpperCase()[1]}'
+            ? dutyName.isEmpty
+                ? ''
+                : ('${dutyName.toUpperCase()[0]}' +
+                    '${dutyName.toUpperCase()[1]}')
             : dutyAbbreviation,
         dutyStartTime = isLeave
             ? TimeOfDay(hour: 00, minute: 00)
