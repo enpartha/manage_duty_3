@@ -104,16 +104,15 @@ class _ViewDutiesPageState extends State<ViewDutiesPage> {
                               ],
                               onSelected: (value) {
                                 ViewDutiesPage.dutyId = myDuties[index].id;
-                                if (value == 'edit') {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              EditDutyPage()));
-                                } else if (value == 'delete') {
+                                if (value == 'Edit') {
+                                  Navigator.of(context).pushNamed(
+                                      EditDutyPage.routeName,
+                                      arguments: ViewDutiesPage.dutyId);
+                                } else if (value == 'Delete') {
                                   setState(
                                     () {
-                                      Provider.of(context, listen: false)
+                                      Provider.of<MyDuty>(context,
+                                              listen: false)
                                           .deleteDuty(ViewDutiesPage.dutyId);
                                     },
                                   );

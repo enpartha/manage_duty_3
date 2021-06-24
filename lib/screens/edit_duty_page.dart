@@ -81,7 +81,7 @@ class _EditDutyPageState extends State<EditDutyPage> {
   void didChangeDependecies() {
     print(EditDutyPage().dutyId);
     if (_isInit) {
-      var id = EditDutyPage().dutyId;
+      final id = ModalRoute.of(context)?.settings.arguments as String?;
       if (id != null) {
         _editedDuty = Provider.of<MyDuty>(context, listen: false).findById(id);
         print(_editedDuty.id);
@@ -122,19 +122,11 @@ class _EditDutyPageState extends State<EditDutyPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text("Duty"),
+        title: Text("Edit Duty"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.check),
-            onPressed: () {
-              setState(() {
-                _saveForm();
-              });
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EditDutyPage()),
-              );
-            },
+            onPressed: _saveForm,
           ),
         ],
       ),
