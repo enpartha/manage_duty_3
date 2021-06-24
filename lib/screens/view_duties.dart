@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/edit_duty_page.dart';
 
@@ -8,11 +9,14 @@ import '../models/duty.dart';
 
 class ViewDutiesPage extends StatelessWidget {
   static const routeName = '/view_duties';
+
+  static String? dutyId;
   const ViewDutiesPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     List<Duty> myDuties = MyDuty().items;
+    MultiProvider(providers: [ChangeNotifierProvider.value(value: MyDuty())]);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
