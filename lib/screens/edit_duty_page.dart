@@ -94,6 +94,8 @@ class _EditDutyPageState extends State<EditDutyPage> {
         };
         _dutyname.text = _initValues['name'].toString();
         _abb.text = _initValues['abbreviation'].toString();
+        _timeinput.text = TimeOfDay(hour: 8, minute: 00).toString();
+        _timeinput2.text = TimeOfDay(hour: 2, minute: 00).toString();
 
         _isInit = false;
       }
@@ -142,19 +144,26 @@ class _EditDutyPageState extends State<EditDutyPage> {
                     child: Icon(Icons.edit),
                   ),
                   title: TextFormField(
-                    controller: _dutyname,
-                    decoration: InputDecoration(
-                        labelText: "Duty Name", border: InputBorder.none),
-                    onSaved: (value) {
-                      _editedDuty = Duty(
-                        dutyName: value.toString(),
-                        dutyAbbreviation: value.toString(),
-                        dutyColor: Colors.blue,
-                        dutyStartTime: TimeOfDay(hour: 8, minute: 00),
-                        dutyEndTime: TimeOfDay(hour: 2, minute: 00),
-                      );
-                    },
-                  ),
+                      //controller: _dutyname,
+                      // initialValue: _dutyname.text,
+                      controller: _dutyname,
+                      decoration: InputDecoration(
+                          labelText: "Duty Name", border: InputBorder.none),
+                      onSaved: (value) {
+                        _editedDuty = Duty(
+                          dutyName: value.toString(),
+                          dutyAbbreviation: value.toString(),
+                          dutyColor: Colors.blue,
+                          dutyStartTime: TimeOfDay(hour: 8, minute: 00),
+                          dutyEndTime: TimeOfDay(hour: 2, minute: 00),
+                        );
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please provide a Duty name.';
+                        }
+                        return null;
+                      }),
                   trailing: Container(
                     height: 40.0,
                     width: 60.0,
@@ -213,7 +222,6 @@ class _EditDutyPageState extends State<EditDutyPage> {
                     child: Icon(Icons.edit),
                   ),
                   title: TextFormField(
-                    controller: _abb,
                     onChanged: (value) {
                       setState(() {});
                     },
@@ -261,6 +269,7 @@ class _EditDutyPageState extends State<EditDutyPage> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.all(5.0),
+                          // ignore: deprecated_member_use
                           child: RaisedButton(
                             onPressed: () {
                               setState(() {
