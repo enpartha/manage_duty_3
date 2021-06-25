@@ -1,31 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:manage_duty_3/models/duty.dart';
-import 'package:manage_duty_3/providers/my_duty.dart';
-import 'package:manage_duty_3/screens/view_duties.dart';
 import 'package:provider/provider.dart';
+
+import '../models/duty.dart';
+import '../providers/my_duty.dart';
 
 class EditDutyPage extends StatefulWidget {
   static const routeName = '/edit_duty';
-
-  final String? dutyId = ViewDutiesPage.dutyId;
-
-  EditDutyPage({
-    Key? key,
-    //this.dutyId
-  }) : super(key: key);
 
   @override
   _EditDutyPageState createState() => _EditDutyPageState();
 }
 
 class _EditDutyPageState extends State<EditDutyPage> {
-  TextEditingController _dutyname = TextEditingController();
-  TextEditingController _abb = TextEditingController();
-  TextEditingController _timeinput = TextEditingController();
-  TextEditingController _timeinput2 = TextEditingController();
+  final _nameCtrlr = TextEditingController();
+  final _abbCtrlr = TextEditingController();
+  final _startTimeCtrlr = TextEditingController();
+  final _endTimeCtrlr = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   int _selectedColor = 0;
   int _selectedButton = 0;
+  var _editedDuty = Duty(
+    id: null,
+    dutyName: '',
+    dutyAbbreviation: '',
+    dutyColor: Colors.lightBlue,
+    dutyStartTime: TimeOfDay(hour: 8, minute: 00),
+    dutyEndTime: TimeOfDay(hour: 14, minute: 00),
+  );
+
+  var _isInit = true;
+
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  TimeOfDay stringToTimeOfDay(String tod) {
+    final format = DateFormat.jm(); //"6:00 AM"
+    return TimeOfDay.fromDateTime(format.parse(tod));
+  }
+
+  Future<Null> _selectStartTime(BuildContext context) async {
+    selectedTime = stringToTimeOfDay(_startTimeCtrlr.text);
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (pickedTime != null) {
+      selectedTime = pickedTime;
+
+      DateTime parsedTime =
+          DateFormat.jm().parse(pickedTime.format(context).toString());
+
+      String formattedTime = DateFormat('hh:mm aa').format(parsedTime);
+      setState(() {
+        _startTimeCtrlr.text = formattedTime;
+      });
+    }
+  }
+
+  Future<Null> _selectEndTime(BuildContext context) async {
+    selectedTime = stringToTimeOfDay(_endTimeCtrlr.text);
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (pickedTime != null) {
+      selectedTime = pickedTime;
+
+      DateTime parsedTime =
+          DateFormat.jm().parse(pickedTime.format(context).toString());
+
+      String formattedTime = DateFormat('hh:mm aa').format(parsedTime);
+      setState(
+        () {
+          _endTimeCtrlr.text = formattedTime;
+        },
+      );
+    }
+  }
 
   final List colors = [
     Color(0xFFEF9A9A),
@@ -40,79 +91,58 @@ class _EditDutyPageState extends State<EditDutyPage> {
     Colors.black
   ];
 
-  List<String> workType = ["work", "off", "vac", "half"];
-  final _formKey = GlobalKey<FormState>();
-  var _editedDuty = Duty(
-    id: EditDutyPage().dutyId,
-    dutyName: '',
-    dutyAbbreviation: '',
-    dutyColor: Colors.lightBlue,
-    dutyStartTime: TimeOfDay(hour: 8, minute: 00),
-    dutyEndTime: TimeOfDay(hour: 2, minute: 00),
-  );
-  var _initValues = {
-    'name': '',
-    'abbreviation': '',
-    'color': Colors.lightBlue,
-    'startTime': TimeOfDay(hour: 8, minute: 00),
-    'endTime': TimeOfDay(hour: 2, minute: 00),
-  };
-
-  var _isInit = true;
+  final List<String> workType = ["work", "off", "vac", "half"];
 
   @override
   void initState() {
-    _timeinput.text = "";
-    _timeinput2.text = "";
     super.initState();
   }
 
   @override
-  void dispose() {
-    _abb.dispose();
-    _dutyname.dispose();
-    _timeinput.dispose();
-    _timeinput2.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    if (_isInit) {
+      final dutyId = ModalRoute.of(context)?.settings.arguments as String?;
+
+      if (dutyId != null) {
+        _editedDuty =
+            Provider.of<MyDuty>(context, listen: false).findById(dutyId);
+
+        _nameCtrlr.text = _editedDuty.dutyName;
+        _abbCtrlr.text = _editedDuty.dutyAbbreviation;
+      }
+      _startTimeCtrlr.text = _editedDuty.dutyStartTime.format(context);
+      _endTimeCtrlr.text = _editedDuty.dutyEndTime.format(context);
+    }
+    _isInit = false;
+    super.didChangeDependencies();
   }
 
   @override
-  // ignore: override_on_non_overriding_member
-  void didChangeDependecies() {
-    print(EditDutyPage().dutyId);
-    if (_isInit) {
-      final id = ModalRoute.of(context)?.settings.arguments as String?;
-      if (id != null) {
-        _editedDuty = Provider.of<MyDuty>(context, listen: false).findById(id);
-        print(_editedDuty.id);
-        _initValues = {
-          'name': _editedDuty.dutyName.toString(),
-          'abbreviation': _editedDuty.dutyAbbreviation.toString(),
-          'color': Colors.lightBlue,
-          'startTime': _editedDuty.dutyStartTime,
-          'endTime': _editedDuty.dutyEndTime,
-        };
-        _dutyname.text = _initValues['name'].toString();
-        _abb.text = _initValues['abbreviation'].toString();
-        _timeinput.text = TimeOfDay(hour: 8, minute: 00).toString();
-        _timeinput2.text = TimeOfDay(hour: 2, minute: 00).toString();
-
-        _isInit = false;
-      }
-
-      super.didChangeDependencies();
-    }
+  void dispose() {
+    _abbCtrlr.dispose();
+    _nameCtrlr.dispose();
+    _startTimeCtrlr.dispose();
+    _endTimeCtrlr.dispose();
+    super.dispose();
   }
 
   void _saveForm() {
-    final id = EditDutyPage().dutyId;
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
     }
     _formKey.currentState!.save();
-    if (id != null) {
-      Provider.of<MyDuty>(context, listen: false).updateDuty(id, _editedDuty);
+    _editedDuty = Duty(
+      id: _editedDuty.id,
+      dutyName: _nameCtrlr.text,
+      dutyAbbreviation: _abbCtrlr.text,
+      dutyColor: colors[_selectedColor],
+      dutyStartTime: stringToTimeOfDay(_startTimeCtrlr.text),
+      dutyEndTime: stringToTimeOfDay(_endTimeCtrlr.text),
+    );
+    if (_editedDuty.id != null) {
+      Provider.of<MyDuty>(context, listen: false)
+          .updateDuty(_editedDuty.id, _editedDuty);
     } else {
       Provider.of<MyDuty>(context, listen: false).addDuty(_editedDuty);
     }
@@ -144,20 +174,9 @@ class _EditDutyPageState extends State<EditDutyPage> {
                     child: Icon(Icons.edit),
                   ),
                   title: TextFormField(
-                      //controller: _dutyname,
-                      // initialValue: _dutyname.text,
-                      controller: _dutyname,
+                      controller: _nameCtrlr,
                       decoration: InputDecoration(
                           labelText: "Duty Name", border: InputBorder.none),
-                      onSaved: (value) {
-                        _editedDuty = Duty(
-                          dutyName: value.toString(),
-                          dutyAbbreviation: value.toString(),
-                          dutyColor: Colors.blue,
-                          dutyStartTime: TimeOfDay(hour: 8, minute: 00),
-                          dutyEndTime: TimeOfDay(hour: 2, minute: 00),
-                        );
-                      },
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'Please provide a Duty name.';
@@ -173,7 +192,9 @@ class _EditDutyPageState extends State<EditDutyPage> {
                     ),
                     child: Center(
                       child: Text(
-                        _abb.text.isEmpty ? 'DUTY' : _abb.text.toString(),
+                        _abbCtrlr.text.isEmpty
+                            ? 'DUTY'
+                            : _abbCtrlr.text.toString(),
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -222,20 +243,12 @@ class _EditDutyPageState extends State<EditDutyPage> {
                     child: Icon(Icons.edit),
                   ),
                   title: TextFormField(
+                    controller: _abbCtrlr,
                     onChanged: (value) {
                       setState(() {});
                     },
                     decoration: InputDecoration(
                         labelText: "ABBREVIATION", border: InputBorder.none),
-                    onSaved: (value) {
-                      _editedDuty = Duty(
-                        dutyName: value.toString(),
-                        dutyAbbreviation: value.toString(),
-                        dutyColor: Colors.blue,
-                        dutyStartTime: TimeOfDay(hour: 8, minute: 00),
-                        dutyEndTime: TimeOfDay(hour: 2, minute: 00),
-                      );
-                    },
                   ),
                 ),
                 Divider(
@@ -269,7 +282,6 @@ class _EditDutyPageState extends State<EditDutyPage> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.all(5.0),
-                          // ignore: deprecated_member_use
                           child: RaisedButton(
                             onPressed: () {
                               setState(() {
@@ -318,43 +330,14 @@ class _EditDutyPageState extends State<EditDutyPage> {
                       child: GestureDetector(
                         child: Builder(builder: (context) {
                           return TextFormField(
-                            controller: _timeinput,
-                            // initialValue:  ,
-
-                            decoration: InputDecoration(
-                                labelText: "START TIME",
-                                border: InputBorder.none),
-                            onSaved: (value) {
-                              _editedDuty = Duty(
-                                dutyName: value.toString(),
-                                dutyAbbreviation: value.toString(),
-                                dutyColor: Colors.blue,
-                                dutyStartTime: TimeOfDay(hour: 8, minute: 00),
-                                dutyEndTime: TimeOfDay(hour: 2, minute: 00),
-                              );
-                            },
-                            readOnly: true,
-                            onTap: () async {
-                              TimeOfDay? pickedTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (pickedTime != null) {
-                                print(pickedTime.format(context));
-                                DateTime parsedTime = DateFormat.jm().parse(
-                                    pickedTime.format(context).toString());
-                                print(parsedTime);
-                                String formattedTime =
-                                    DateFormat('hh:mm aa').format(parsedTime);
-                                print(formattedTime);
-                                setState(() {
-                                  _timeinput.text = formattedTime;
-                                });
-                              } else {
-                                print("Time is not selected");
-                              }
-                            },
-                          );
+                              controller: _startTimeCtrlr,
+                              decoration: InputDecoration(
+                                  labelText: "START TIME",
+                                  border: InputBorder.none),
+                              readOnly: true,
+                              onTap: () {
+                                _selectStartTime(context);
+                              });
                         }),
                       ),
                     ),
@@ -367,41 +350,13 @@ class _EditDutyPageState extends State<EditDutyPage> {
                       child: GestureDetector(
                         child: Builder(builder: (context) {
                           return TextFormField(
-                            // initialValue: ,
-                            controller: _timeinput2,
+                            controller: _endTimeCtrlr,
                             decoration: InputDecoration(
                                 labelText: "END TIME",
-                                // hintText: "Time",
                                 border: InputBorder.none),
-                            onSaved: (value) {
-                              _editedDuty = Duty(
-                                dutyName: value.toString(),
-                                dutyAbbreviation: value.toString(),
-                                dutyColor: Colors.blue,
-                                dutyStartTime: TimeOfDay(hour: 8, minute: 00),
-                                dutyEndTime: TimeOfDay(hour: 2, minute: 00),
-                              );
-                            },
                             readOnly: true,
-                            onTap: () async {
-                              TimeOfDay? pickedTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (pickedTime != null) {
-                                print(pickedTime.format(context));
-                                DateTime parsedTime = DateFormat.jm().parse(
-                                    pickedTime.format(context).toString());
-                                print(parsedTime);
-                                String formattedTime =
-                                    DateFormat('hh:mm aa').format(parsedTime);
-                                print(formattedTime);
-                                setState(() {
-                                  _timeinput2.text = formattedTime;
-                                });
-                              } else {
-                                print("Time is not selected");
-                              }
+                            onTap: () {
+                              _selectEndTime(context);
                             },
                           );
                         }),

@@ -4,31 +4,28 @@ class Duty with ChangeNotifier {
   final String dutyName;
   String dutyAbbreviation;
   Color dutyColor;
-  TimeOfDay dutyStartTime = TimeOfDay(hour: 00, minute: 00);
-  TimeOfDay dutyEndTime = TimeOfDay(hour: 23, minute: 59);
   bool onDuty;
-  bool isLeave;
+  bool isAllDay = false;
   String? id;
+  TimeOfDay dutyStartTime;
+  TimeOfDay dutyEndTime;
 
   Duty({
     required this.dutyName,
     this.dutyColor = Colors.grey,
     String dutyAbbreviation = '',
     this.onDuty = true,
-    this.isLeave = false,
-    TimeOfDay? dutyStartTime,
-    TimeOfDay? dutyEndTime,
-    this.id,
-  })  : dutyAbbreviation = dutyAbbreviation.isEmpty
+    this.isAllDay = false,
+    TimeOfDay dutyStartTime = const TimeOfDay(hour: 00, minute: 00),
+    TimeOfDay dutyEndTime = const TimeOfDay(hour: 00, minute: 00),
+    required this.id,
+  })   : dutyAbbreviation = dutyAbbreviation.isEmpty
             ? dutyName.isEmpty
                 ? ''
                 : ('${dutyName.toUpperCase()[0]}' +
                     '${dutyName.toUpperCase()[1]}')
             : dutyAbbreviation,
-        dutyStartTime = isLeave
-            ? TimeOfDay(hour: 00, minute: 00)
-            : TimeOfDay(hour: 12, minute: 0),
-        dutyEndTime = isLeave
-            ? TimeOfDay(hour: 24, minute: 00)
-            : TimeOfDay(hour: 18, minute: 0);
+        dutyStartTime =
+            isAllDay ? TimeOfDay(hour: 00, minute: 00) : dutyStartTime,
+        dutyEndTime = isAllDay ? TimeOfDay(hour: 24, minute: 00) : dutyEndTime;
 }

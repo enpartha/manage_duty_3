@@ -64,7 +64,10 @@ class MyDuty with ChangeNotifier {
   void addDuty(duty) {
     final newDuty = Duty(
       dutyName: duty.dutyName,
-      //add variables here
+      dutyAbbreviation: duty.dutyAbbreviation,
+      dutyColor: duty.dutyColor,
+      dutyStartTime: duty.dutyStartTime,
+      dutyEndTime: duty.dutyEndTime,
       id: DateTime.now().toString(),
     );
 
@@ -76,7 +79,7 @@ class MyDuty with ChangeNotifier {
     final dutyIndex = _dutyItems.indexWhere((element) => element.id == id);
     if (dutyIndex >= 0) {
       _dutyItems[dutyIndex] = duty;
-      _dutyItems[dutyIndex].id = id;
+
       notifyListeners();
     }
   }
