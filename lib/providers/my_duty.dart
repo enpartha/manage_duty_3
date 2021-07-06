@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:manage_duty_3/models/http_exception.dart';
 
 import '../models/duty.dart';
+import 'package:http/http.dart' as http;
 
 class MyDuty with ChangeNotifier {
   static List<Duty> _dutyItems = [
@@ -53,6 +57,9 @@ class MyDuty with ChangeNotifier {
       dutyColor: Colors.green,
     ),
   ];
+
+  final url =
+      Uri.https('manage-duty-default-rtdb.firebaseio.com', '/duties.json');
   List<Duty> get items {
     return [..._dutyItems];
   }
@@ -61,31 +68,96 @@ class MyDuty with ChangeNotifier {
     return _dutyItems.firstWhere((duty) => duty.id == id);
   }
 
-  void addDuty(duty) {
-    final newDuty = Duty(
-      dutyName: duty.dutyName,
-      dutyAbbreviation: duty.dutyAbbreviation,
-      dutyColor: duty.dutyColor,
-      dutyStartTime: duty.dutyStartTime,
-      dutyEndTime: duty.dutyEndTime,
-      id: DateTime.now().toString(),
-    );
+  Future<void> fetchDuties() async {
+    try {
+      final response = await http.get(url);
+      final decodedJSON = jsonDecode(response.body);
 
-    _dutyItems.add(newDuty);
-    notifyListeners();
+      final extractedData =
+          decodedJSON != null ? decodedJSON as Map<String, dynamic> : {};
+      final List<Duty> loadedDuty = [];
+      extractedData.forEach((dutyId, dutyData) {
+        loadedDuty.add(
+          Duty(
+              id: dutyId,
+              dutyName: dutyData['name'],
+              dutyAbbreviation: dutyData['abbreviation'],
+              dutyColor: dutyData['color'],
+              dutyStartTime: dutyData['startTime'],
+              dutyEndTime: dutyData['endTime']),
+        );
+      });
+
+      _dutyItems = loadedDuty;
+    } catch (error) {
+      print(error);
+    }
   }
 
-  void updateDuty(id, Duty duty) {
+  Future<void> addDuty(duty) async {
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'name': duty.dutyName,
+          'abbreviation': duty.dutyAbbreviation,
+          'color': duty.dutyColor,
+          'startTime': duty.dutyStartTime,
+          'endTime': duty.dutyEndTime
+        }),
+      );
+      final newDuty = Duty(
+        dutyName: duty.dutyName,
+        dutyAbbreviation: duty.dutyAbbreviation,
+        dutyColor: duty.dutyColor,
+        dutyStartTime: duty.dutyStartTime,
+        dutyEndTime: duty.dutyEndTime,
+        id: json.decode(response.body)['name'],
+      );
+
+      _dutyItems.add(newDuty);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> updateDuty(id, Duty duty) async {
     final dutyIndex = _dutyItems.indexWhere((element) => element.id == id);
     if (dutyIndex >= 0) {
+      final _url = Uri.https(
+          'manage-duty-default-rtdb.firebaseio.com', '/duties/$id.json');
+      http.patch(_url,
+          body: json.encode({
+            'name': duty.dutyName,
+            'abbreviation': duty.dutyAbbreviation,
+            'color': duty.dutyColor,
+            'startTime': duty.dutyStartTime,
+            'endTime': duty.dutyEndTime
+          }));
       _dutyItems[dutyIndex] = duty;
+      _dutyItems[dutyIndex].id = id;
 
       notifyListeners();
     }
   }
 
-  void deleteDuty(id) {
-    _dutyItems.removeWhere((element) => element.id == id);
+  Future<void> deleteDuty(id) async {
+    final _url = Uri.https(
+        'manage-duty-default-rtdb.firebaseio.com', '/duties/$id.json');
+    final existingGroupIndex =
+        _dutyItems.indexWhere((element) => element.id == id);
+    var existingGroup = _dutyItems[existingGroupIndex];
+    notifyListeners();
+    final respose = await http.delete(_url);
+    if (respose.statusCode >= 400) {
+      _dutyItems.insert(existingGroupIndex, existingGroup);
+      notifyListeners();
+      throw HttpException("Could not delete");
+    }
+
+    existingGroup = Duty(dutyName: '', id: '');
+    // _dutyItems.removeWhere((element) => element.id == id);
     print('deleted');
     notifyListeners();
   }
