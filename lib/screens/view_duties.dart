@@ -32,6 +32,7 @@ class _ViewDutiesPageState extends State<ViewDutiesPage> {
         _isLoading = true;
       });
       Provider.of<MyDuty>(context).fetchDuties().then((_) {
+        print(MyDuty().items);
         setState(() {
           _isLoading = false;
         });
@@ -67,110 +68,103 @@ class _ViewDutiesPageState extends State<ViewDutiesPage> {
         child: Icon(Icons.add),
       ),
       body: RefreshIndicator(
-          onRefresh: () => _refreshDuties(context),
-          child: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : myDuties.isEmpty
-                  ? Center(
-                      child: Text("No Duties"),
-                    )
-                  : Consumer<MyDuty>(builder: (context, duties, child) {
-                      return ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: myDuties.length,
-                        itemBuilder: (BuildContext ctx, int index) {
-                          return Card(
-                            margin: EdgeInsets.fromLTRB(12, 12, 12, 0),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
-                            elevation: 5,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).pushNamed('/view_duties',
-                                    arguments: duties.items[index].id);
-                              },
-                              child: Column(
-                                children: <ListTile>[
-                                  ListTile(
-                                    leading: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        color: myDuties[index].dutyColor,
-                                      ),
+        onRefresh: () => _refreshDuties(context),
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : myDuties.isEmpty
+                ? Center(
+                    child: Text("No Duties"),
+                  )
+                : ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: myDuties.length,
+                    itemBuilder: (BuildContext ctx, int index) {
+                      return Card(
+                        margin: EdgeInsets.fromLTRB(12, 12, 12, 0),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        elevation: 5,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/view_duties',
+                                arguments: myDuties[index].id);
+                          },
+                          child: Column(
+                            children: <ListTile>[
+                              ListTile(
+                                leading: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: myDuties[index].dutyColor,
+                                  ),
 
-                                      // height: 30,
-                                      width: 60,
-                                      child: Center(
-                                        child: Text(
-                                          myDuties[index].dutyAbbreviation,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    title: Text(duties.items[index].dutyName),
-                                    subtitle: Text(DateFormat('hh:mm aa')
-                                            .format(DateFormat.jm().parse(
-                                                myDuties[index]
-                                                    .dutyStartTime
-                                                    .format(context)
-                                                    .toString())) +
-                                        ' to ' +
-                                        DateFormat('hh:mm aa').format(
-                                            DateFormat.jm().parse(
-                                                myDuties[index]
-                                                    .dutyEndTime
-                                                    .format(context)
-                                                    .toString()))),
-                                    trailing: PopupMenuButton(
-                                      offset: Offset(0, -40),
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: 'Edit',
-                                          child: Text(
-                                            'Edit',
-                                          ),
-                                        ),
-                                        PopupMenuItem(
-                                          value: 'Delete',
-                                          child: Text(
-                                            'Delete',
-                                          ),
-                                        ),
-                                      ],
-                                      onSelected: (value) async {
-                                        ViewDutiesPage.dutyId =
-                                            duties.items[index].id;
-                                        if (value == 'Edit') {
-                                          Navigator.of(context).pushNamed(
-                                              EditDutyPage.routeName,
-                                              arguments:
-                                                  duties.items[index].id);
-                                        } else if (value == 'Delete') {
-                                          try {
-                                            await Provider.of<MyDuty>(context,
-                                                    listen: false)
-                                                .deleteDuty(
-                                                    ViewDutiesPage.dutyId);
-                                          } catch (error) {
-                                            scaffold.showSnackBar(SnackBar(
-                                                content:
-                                                    Text("Deleting Falied!")));
-                                          }
-                                        }
-                                      },
+                                  // height: 30,
+                                  width: 60,
+                                  child: Center(
+                                    child: Text(
+                                      myDuties[index].dutyAbbreviation,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                ],
+                                ),
+                                title: Text(myDuties[index].dutyName),
+                                subtitle: Text(DateFormat('hh:mm aa').format(
+                                        DateFormat.jm().parse(myDuties[index]
+                                            .dutyStartTime
+                                            .format(context)
+                                            .toString())) +
+                                    ' to ' +
+                                    DateFormat('hh:mm aa').format(
+                                        DateFormat.jm().parse(myDuties[index]
+                                            .dutyEndTime
+                                            .format(context)
+                                            .toString()))),
+                                trailing: PopupMenuButton(
+                                  offset: Offset(0, -40),
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: 'Edit',
+                                      child: Text(
+                                        'Edit',
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'Delete',
+                                      child: Text(
+                                        'Delete',
+                                      ),
+                                    ),
+                                  ],
+                                  onSelected: (value) async {
+                                    ViewDutiesPage.dutyId = myDuties[index].id;
+                                    if (value == 'Edit') {
+                                      Navigator.of(context).pushNamed(
+                                          EditDutyPage.routeName,
+                                          arguments: myDuties[index].id);
+                                    } else if (value == 'Delete') {
+                                      try {
+                                        await Provider.of<MyDuty>(context,
+                                                listen: false)
+                                            .deleteDuty(ViewDutiesPage.dutyId);
+                                      } catch (error) {
+                                        scaffold.showSnackBar(SnackBar(
+                                            content: Text("Deleting Falied!")));
+                                      }
+                                    }
+                                  },
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            ],
+                          ),
+                        ),
                       );
-                    })),
+                    },
+                  ),
+      ),
     );
   }
 }
