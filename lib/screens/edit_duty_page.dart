@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:manage_duty_3/screens/view_duties.dart';
 import 'package:provider/provider.dart';
+//import 'package:custom_switch/custom_switch.dart';
+import '../widget/custom_switch.dart';
 
 import '../models/duty.dart';
 import '../providers/my_duty.dart';
@@ -35,6 +37,8 @@ class _EditDutyPageState extends State<EditDutyPage> {
   var _isLoading = false;
 
   TimeOfDay selectedTime = TimeOfDay.now();
+
+  var isAllDay = false;
 
   TimeOfDay stringToTimeOfDay(String tod) {
     final format = DateFormat.jm(); //"6:00 AM"
@@ -169,6 +173,53 @@ class _EditDutyPageState extends State<EditDutyPage> {
 
         Navigator.of(context).pop();
       }
+    }
+  }
+
+  Widget setTimeDuty(bool isAllDay) {
+    if (!isAllDay) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Container(
+            width: 90,
+            child: GestureDetector(
+              child: Builder(builder: (context) {
+                return TextFormField(
+                    controller: _startTimeCtrlr,
+                    decoration: InputDecoration(
+                        labelText: "START TIME", border: InputBorder.none),
+                    readOnly: true,
+                    onTap: () {
+                      _selectStartTime(context);
+                    });
+              }),
+            ),
+          ),
+          Text(
+            ">",
+            style: TextStyle(fontSize: 30),
+          ),
+          Container(
+            width: 80,
+            child: GestureDetector(
+              child: Builder(builder: (context) {
+                return TextFormField(
+                  controller: _endTimeCtrlr,
+                  decoration: InputDecoration(
+                      labelText: "END TIME", border: InputBorder.none),
+                  readOnly: true,
+                  onTap: () {
+                    _selectEndTime(context);
+                  },
+                );
+              }),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Container();
     }
   }
 
@@ -336,63 +387,40 @@ class _EditDutyPageState extends State<EditDutyPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 7.0),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Icon(Icons.timer),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Icon(Icons.timer),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    "Schedule",
+                                    style: TextStyle(fontSize: 17.0),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                "Schedule",
-                                style: TextStyle(fontSize: 17.0),
+                            Container(
+                              padding: EdgeInsets.only(right: 12),
+                              child: CustomSwitch(
+                                activeColor: Colors.teal,
+                                value: isAllDay,
+                                onChanged: (value) {
+                                  print("VALUE : $value");
+                                  setState(() {
+                                    isAllDay = value;
+                                  });
+                                },
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            width: 90,
-                            child: GestureDetector(
-                              child: Builder(builder: (context) {
-                                return TextFormField(
-                                    controller: _startTimeCtrlr,
-                                    decoration: InputDecoration(
-                                        labelText: "START TIME",
-                                        border: InputBorder.none),
-                                    readOnly: true,
-                                    onTap: () {
-                                      _selectStartTime(context);
-                                    });
-                              }),
-                            ),
-                          ),
-                          Text(
-                            ">",
-                            style: TextStyle(fontSize: 30),
-                          ),
-                          Container(
-                            width: 80,
-                            child: GestureDetector(
-                              child: Builder(builder: (context) {
-                                return TextFormField(
-                                  controller: _endTimeCtrlr,
-                                  decoration: InputDecoration(
-                                      labelText: "END TIME",
-                                      border: InputBorder.none),
-                                  readOnly: true,
-                                  onTap: () {
-                                    _selectEndTime(context);
-                                  },
-                                );
-                              }),
-                            ),
-                          ),
-                        ],
-                      ),
+                      setTimeDuty(isAllDay),
                     ],
                   ),
                 ),
