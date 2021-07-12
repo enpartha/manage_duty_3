@@ -1,5 +1,7 @@
 library custom_switch;
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 class CustomSwitch extends StatefulWidget {
@@ -13,6 +15,9 @@ class CustomSwitch extends StatefulWidget {
 
   @override
   _CustomSwitchState createState() => _CustomSwitchState();
+
+  void switchMoveForward() => _CustomSwitchState().switchMoveForward();
+  void switchMoveReverse() => _CustomSwitchState().switchMoveReverse();
 }
 
 class _CustomSwitchState extends State<CustomSwitch>
@@ -31,6 +36,24 @@ class _CustomSwitchState extends State<CustomSwitch>
         .animate(CurvedAnimation(
             parent: _animationController, curve: Curves.linear));
   }
+
+  void switchMoveForward() {
+    setState(() {
+      _animationController.forward();
+      //  triggerCustomSwitch();
+    });
+  }
+
+  void switchMoveReverse() {
+    setState(() {
+      if (_animationController.isCompleted) {
+        _animationController.reverse();
+      }
+      //   triggerCustomSwitch();
+    });
+  }
+
+  //Widget? triggerCustomSwitch() {}
 
   @override
   Widget build(BuildContext context) {

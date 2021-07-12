@@ -23,7 +23,7 @@ class _EditDutyPageState extends State<EditDutyPage> {
   final _endTimeCtrlr = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   int _selectedColor = 0;
-  int _selectedButton = 0;
+  int _typeButton = 0;
   var _editedDuty = Duty(
     id: null,
     dutyName: '',
@@ -136,6 +136,7 @@ class _EditDutyPageState extends State<EditDutyPage> {
       dutyColor: colors[_selectedColor],
       dutyStartTime: stringToTimeOfDay(_startTimeCtrlr.text),
       dutyEndTime: stringToTimeOfDay(_endTimeCtrlr.text),
+      isAllDay: isAllDay,
     );
     setState(() {
       _isLoading = true;
@@ -173,6 +174,48 @@ class _EditDutyPageState extends State<EditDutyPage> {
 
         Navigator.of(context).pop();
       }
+    }
+  }
+
+  void typeButtonAction() {
+    switch (_typeButton) {
+      case 0:
+        isAllDay = false;
+        CustomSwitch(value: isAllDay).switchMoveReverse();
+        break;
+      case 1:
+        isAllDay = true;
+        CustomSwitch(
+          activeColor: Colors.teal,
+          value: isAllDay,
+          onChanged: (value) {
+            print("VALUE : $value");
+            setState(() {
+              isAllDay = value;
+            });
+          },
+        ).switchMoveForward();
+        setTimeDuty(isAllDay);
+        break;
+      case 2:
+        isAllDay = true;
+        CustomSwitch(
+          activeColor: Colors.teal,
+          value: isAllDay,
+          onChanged: (value) {
+            print("VALUE : $value");
+            setState(() {
+              isAllDay = value;
+            });
+          },
+        ).switchMoveForward();
+        setTimeDuty(isAllDay);
+        break;
+      case 3:
+        isAllDay = false;
+        CustomSwitch(value: isAllDay).switchMoveReverse();
+        break;
+      default:
     }
   }
 
@@ -365,14 +408,15 @@ class _EditDutyPageState extends State<EditDutyPage> {
                                 child: RaisedButton(
                                   onPressed: () {
                                     setState(() {
-                                      _selectedButton = index;
+                                      _typeButton = index;
+                                      typeButtonAction();
                                     });
                                   },
                                   child: Text(workType[index]),
-                                  color: _selectedButton == index
+                                  color: _typeButton == index
                                       ? Colors.blue
                                       : Colors.white,
-                                  textColor: _selectedButton == index
+                                  textColor: _typeButton == index
                                       ? Colors.white
                                       : Colors.black,
                                 ),
