@@ -1,7 +1,3 @@
-library custom_switch;
-
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
 class CustomSwitch extends StatefulWidget {
@@ -9,15 +5,11 @@ class CustomSwitch extends StatefulWidget {
   final ValueChanged<bool>? onChanged;
   final Color? activeColor;
 
-  const CustomSwitch(
-      {Key? key, this.value = false, this.onChanged, this.activeColor})
+  CustomSwitch({Key? key, this.value = false, this.onChanged, this.activeColor})
       : super(key: key);
 
   @override
   _CustomSwitchState createState() => _CustomSwitchState();
-
-  void switchMoveForward() => _CustomSwitchState().switchMoveForward();
-  void switchMoveReverse() => _CustomSwitchState().switchMoveReverse();
 }
 
 class _CustomSwitchState extends State<CustomSwitch>
@@ -29,7 +21,7 @@ class _CustomSwitchState extends State<CustomSwitch>
   void initState() {
     super.initState();
     _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 60));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
     _circleAnimation = AlignmentTween(
             begin: widget.value ? Alignment.centerRight : Alignment.centerLeft,
             end: widget.value ? Alignment.centerLeft : Alignment.centerRight)
@@ -37,29 +29,16 @@ class _CustomSwitchState extends State<CustomSwitch>
             parent: _animationController, curve: Curves.linear));
   }
 
-  void switchMoveForward() {
-    setState(() {
-      _animationController.forward();
-      //  triggerCustomSwitch();
-    });
-  }
-
-  void switchMoveReverse() {
-    setState(() {
-      if (_animationController.isCompleted) {
-        _animationController.reverse();
-      }
-      //   triggerCustomSwitch();
-    });
-  }
-
-  //Widget? triggerCustomSwitch() {}
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
+        if (widget.value) {
+          _animationController.forward();
+        } else {
+          _animationController.reverse();
+        }
         return GestureDetector(
           onTap: () {
             if (_animationController.isCompleted) {

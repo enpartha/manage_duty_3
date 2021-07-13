@@ -38,14 +38,14 @@ class _EditDutyPageState extends State<EditDutyPage> {
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
-  var isAllDay = false;
+  static var isAllDay = false;
 
   TimeOfDay stringToTimeOfDay(String tod) {
     final format = DateFormat.jm(); //"6:00 AM"
     return TimeOfDay.fromDateTime(format.parse(tod));
   }
 
-  Future<Null> _selectStartTime(BuildContext context) async {
+  Future<void> _selectStartTime(BuildContext context) async {
     selectedTime = stringToTimeOfDay(_startTimeCtrlr.text);
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -64,7 +64,7 @@ class _EditDutyPageState extends State<EditDutyPage> {
     }
   }
 
-  Future<Null> _selectEndTime(BuildContext context) async {
+  Future<void> _selectEndTime(BuildContext context) async {
     selectedTime = stringToTimeOfDay(_endTimeCtrlr.text);
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -180,40 +180,26 @@ class _EditDutyPageState extends State<EditDutyPage> {
   void typeButtonAction() {
     switch (_typeButton) {
       case 0:
-        isAllDay = false;
-        CustomSwitch(value: isAllDay).switchMoveReverse();
+        setState(() {
+          isAllDay = false;
+        });
         break;
       case 1:
-        isAllDay = true;
-        CustomSwitch(
-          activeColor: Colors.teal,
-          value: isAllDay,
-          onChanged: (value) {
-            print("VALUE : $value");
-            setState(() {
-              isAllDay = value;
-            });
-          },
-        ).switchMoveForward();
+        setState(() {
+          isAllDay = true;
+        });
         setTimeDuty(isAllDay);
         break;
       case 2:
-        isAllDay = true;
-        CustomSwitch(
-          activeColor: Colors.teal,
-          value: isAllDay,
-          onChanged: (value) {
-            print("VALUE : $value");
-            setState(() {
-              isAllDay = value;
-            });
-          },
-        ).switchMoveForward();
+        setState(() {
+          isAllDay = true;
+        });
         setTimeDuty(isAllDay);
         break;
       case 3:
-        isAllDay = false;
-        CustomSwitch(value: isAllDay).switchMoveReverse();
+        setState(() {
+          isAllDay = false;
+        });
         break;
       default:
     }
@@ -428,7 +414,8 @@ class _EditDutyPageState extends State<EditDutyPage> {
                         indent: 10,
                         thickness: 1,
                       ),
-                      Padding(
+                      Container(
+                        width: MediaQuery.of(context).size.width,
                         padding: const EdgeInsets.only(left: 7.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
