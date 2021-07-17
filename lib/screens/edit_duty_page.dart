@@ -205,44 +205,100 @@ class _EditDutyPageState extends State<EditDutyPage> {
     }
   }
 
+  printDutyHour() {
+    var startTime = stringToTimeOfDay(_startTimeCtrlr.text);
+    var endTime = stringToTimeOfDay(_endTimeCtrlr.text);
+    double _dutyStartTime =
+        startTime.hour.toDouble() + (startTime.minute.toDouble() / 60);
+    double _dutyEndTime =
+        endTime.hour.toDouble() + (endTime.minute.toDouble() / 60);
+
+    double _timeDiff = _dutyEndTime - _dutyStartTime;
+    if (_timeDiff < 0) {
+      _timeDiff = _timeDiff + 24;
+    }
+    double _hr = _timeDiff.truncate().toDouble();
+    double _minute = (_timeDiff - _timeDiff.truncate()) * 60;
+
+    String hrs = _hr.toInt().toString();
+    String min = _minute.toInt().toString();
+
+    String dutyDuration = hrs + " H  " + min + " m";
+    return dutyDuration;
+  }
+
   Widget setTimeDuty(bool isAllDay) {
     if (!isAllDay) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      return Column(
         children: [
-          Container(
-            width: 90,
-            child: GestureDetector(
-              child: Builder(builder: (context) {
-                return TextFormField(
-                    controller: _startTimeCtrlr,
-                    decoration: InputDecoration(
-                        labelText: "START TIME", border: InputBorder.none),
-                    readOnly: true,
-                    onTap: () {
-                      _selectStartTime(context);
-                    });
-              }),
-            ),
-          ),
-          Text(
-            ">",
-            style: TextStyle(fontSize: 30),
-          ),
-          Container(
-            width: 80,
-            child: GestureDetector(
-              child: Builder(builder: (context) {
-                return TextFormField(
-                  controller: _endTimeCtrlr,
-                  decoration: InputDecoration(
-                      labelText: "END TIME", border: InputBorder.none),
-                  readOnly: true,
-                  onTap: () {
-                    _selectEndTime(context);
-                  },
-                );
-              }),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 90,
+                  child: GestureDetector(
+                    child: Builder(builder: (context) {
+                      return TextFormField(
+                          controller: _startTimeCtrlr,
+                          decoration: InputDecoration(
+                              labelText: "START TIME",
+                              border: InputBorder.none),
+                          readOnly: true,
+                          onTap: () {
+                            _selectStartTime(context);
+                          });
+                    }),
+                  ),
+                ),
+                Text(
+                  ">",
+                  style: TextStyle(fontSize: 30),
+                ),
+                Container(
+                  width: 80,
+                  child: GestureDetector(
+                    child: Builder(builder: (context) {
+                      return TextFormField(
+                        controller: _endTimeCtrlr,
+                        decoration: InputDecoration(
+                            labelText: "END TIME", border: InputBorder.none),
+                        readOnly: true,
+                        onTap: () {
+                          _selectEndTime(context);
+                        },
+                      );
+                    }),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 8,
+                          color: Colors.black26,
+                          offset: Offset(2, 2))
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Duration:",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      Text(
+                        printDutyHour(),
+                        style: TextStyle(fontSize: 15, color: Colors.blue[900]),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],

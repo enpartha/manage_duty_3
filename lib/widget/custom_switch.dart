@@ -21,7 +21,7 @@ class _CustomSwitchState extends State<CustomSwitch>
   void initState() {
     super.initState();
     _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 120));
     _circleAnimation = AlignmentTween(
             begin: widget.value ? Alignment.centerRight : Alignment.centerLeft,
             end: widget.value ? Alignment.centerLeft : Alignment.centerRight)
@@ -41,11 +41,11 @@ class _CustomSwitchState extends State<CustomSwitch>
         }
         return GestureDetector(
           onTap: () {
-            if (_animationController.isCompleted) {
-              _animationController.reverse();
-            } else {
-              _animationController.forward();
-            }
+            // if (_animationController.isCompleted) {
+            //   _animationController.reverse();
+            // } else {
+            //   _animationController.forward();
+            // }
             widget.value == false
                 ? widget.onChanged!(true)
                 : widget.onChanged!(false);
